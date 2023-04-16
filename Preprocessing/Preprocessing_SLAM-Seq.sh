@@ -1,8 +1,7 @@
 # Before start:
+# -- Download slamseq pipline from https://nf-co.re/slamseq
 # -- prepare slamsample_meta.txt
-# -- Reverse Complement reads 1 if you are using strand sepecific library preparation
-
-
+# -- Reverse Complement reads1 if you are using strand sepecific library preparation
 
 module load bioinfo-tools
 module load gnuparallel/20180822
@@ -23,9 +22,6 @@ export NXF_SINGULARITY_CACHEDIR=$NXF_HOME/singularity
 # Step1: Reverse Complement fastq and save to a new folder
 cd $fastqdir
 find *.fastq.gz | parallel -a - -j 16 seqkit seq --seq-type DNA -r -p {} '|' gzip -c  '>' ../RCread1/{} 
-
-
-
 
 # Step 2: Using nextflow slamdunk perform T to C conversions calling
 # for default setting conversion >= 2 is considered as labeled
