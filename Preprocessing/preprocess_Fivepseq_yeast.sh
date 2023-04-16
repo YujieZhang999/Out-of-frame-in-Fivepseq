@@ -1,3 +1,5 @@
+
+
 #!/bin/bash -l
 
 f_dir='fastq'
