@@ -1,4 +1,4 @@
-
+# Download fivepseq package from https://github.com/lilit-nersisyan/fivepseq
 
 #!/bin/bash -l
 
