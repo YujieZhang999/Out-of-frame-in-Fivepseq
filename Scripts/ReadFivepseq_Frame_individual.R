@@ -1,21 +1,7 @@
-
-# # -----------------------------------------------------------------------
-# This is to calculate the frame preference for each individual samples without
-# merge the index together
-# # -----------------------------------------------------------------------
-
-#workdir <- "/Users/yujiezhang/OneDrive - KI.SE/2021_slamseq_projects/2021_slamseq_for_FS"
-#fivepseq_count <- file.path(workdir,"fivepseq_CSM_AA")
-#rds <- file.path(workdir,"rds_repeat")
-#plotdir <- file.path("/Users/yujiezhang/OneDrive - KI.SE/2021_slamseq_projects/2021_slamseq_for_FS/plot","Stress")
-#dataDir <- file.path("/Users/yujiezhang/OneDrive - KI.SE/2021_slamseq_projects/2021_slamseq_for_FS","stress")
-#datadir <- file.path(workdir,"datadir")
-#whichsample ="CSM_AA"
 # Load libraries
-
 library("tidyverse")
-library(dplyr)
-library("zoo") # Using index
+library("dplyr")
+library("zoo")
 library("cowplot")
 library("coRdon")
 library("RGenetics")
@@ -24,6 +10,7 @@ library("ggrepel")
 opts <- options(stringsAsFactors = F)
 ## data input: generates a list with samples, and keeps the frame stats, transcript descriptors and libsize for each sample. 
 
+# Read data from fivepseq output file
 data.name <- "data_summary.txt"
 data.files <- list.files(fivepseq_count, data.name, full.names = T, recursive = T)
 samples <- unlist(lapply(data.files, function(x) {
@@ -49,8 +36,7 @@ for (t.des.f in t.des.files) {
   mydata[[name]][["t.des"]] <- t.des
 }
 
-## count positions are extended 100 nt from the start and the end.
-full_length.name <- "counts_FULL_LENGTH.txt"
+full_length.name <- "counts_FULL_LENGTH.txt" ## fivepseq package count positions are extended 100 nt from the start and the end.
 count.length.files <- list.files(fivepseq_count, full_length.name, full.names = T, recursive = T)
 for (count.f in count.length.files) {
   l <- readLines(count.f)
@@ -68,31 +54,41 @@ for (t.ass.f in t.ass.files) {
   t.ass <- t.ass %>% mutate(cds_start = cds_start + 1) # This is to match the 5pseq reference with database
   mydata[[name]][["t.ass"]] <- t.ass
 }
-#saveRDS(t.ass,file.path(workdir,"t.ass.rds"))
+
 # filter low expressed genes: generated and index,which indicates high coverage genes
 # if only read the output from last step
-# retain.ind <- c()
-# rpm_threshold <- 20
-# count_threshold <- 80
-# pos_threshold <- 40
-# gene_length <- 400 ## select genes longer than 400-bp 
-# # For low sequenced samples
+library_type <- "low" # or "high"
 
-retain.ind <- c()
-rpm_threshold <- 10
-count_threshold <- 30
-pos_threshold <- 20
-gene_length <- 400
+if (library_type == "low") {
+  retain.ind <- c()
+  rpm_threshold <- 10
+  count_threshold <- 30
+  pos_threshold <- 20
+  gene_length <- 400
+} else {
+  retain.ind <- c()
+  rpm_threshold <- 20
+  count_threshold <- 80
+  pos_threshold <- 40
+  gene_length <- 400
+}
 
+
+sample_type <- "other" # or "human"
 for (s in samples) {
   t.des <- mydata[[s]][["t.des"]]
   pass.ind <- which(10^6 * t.des$NumOfReads / mydata[[s]]$libsize >= rpm_threshold &
                       t.des$NumOfReads >= count_threshold &
-                      t.des$NumOfMapPositions >= pos_threshold &
-                     # t.des$X3nt == "True" &  These parameters are for human, becasue they have too entires
-                    #  t.des$start == "ATG"  &
-                     # t.des$stop %in% c("TAG","TGA","TAA") &
-                      t.des$len >= gene_length)
+                      t.des$NumOfMapPositions >= pos_threshold)
+  
+  if (sample_type == "human") {
+    pass.ind <- intersect(pass.ind, which(t.des$X3nt == "True" &
+                                            t.des$start == "ATG" &
+                                            t.des$stop %in% c("TAG","TGA","TAA") &
+                                            t.des$len >= gene_length))
+  } else {
+    pass.ind <- intersect(pass.ind, which(t.des$len >= gene_length))
+  }
   
   retain.ind <- c(retain.ind, pass.ind)
   retain.ind <- intersect(pass.ind, retain.ind)
@@ -128,10 +124,10 @@ SubList_Count_Exlude50 <- function(whichlist) {
 SubFrame_list_Exclude50 <- map(SubFrame_list, SubList_Count_Exlude50)
 SubCount_list_Exclude50 <- map(SubCount_list, SubList_Count_Exlude50) 
 
-SubCountFrame_list <- list("SubFrame_list"=SubFrame_list,
-                           "SubCount_list"=SubCount_list,
-                           "SubFrame_list_Exclude50"=SubFrame_list_Exclude50,
-                           "SubCount_list_Exclude50"=SubCount_list_Exclude50)
+SubCountFrame_list <- list("SubFrame_list" = SubFrame_list,
+                           "SubCount_list" = SubCount_list,
+                           "SubFrame_list_Exclude50" = SubFrame_list_Exclude50,
+                           "SubCount_list_Exclude50" = SubCount_list_Exclude50)
 
 
 ## Calculate theboo gene specific frame coverage using the middle of the genes
@@ -150,7 +146,7 @@ CountFrame <- function(whichFrame = x1,whichCount = x2) {
 }
 
 FrameCount_list <- map2(SubFrame_list_Exclude50,SubCount_list_Exclude50,CountFrame)
-FrameCount_ORF_list <- map2(SubFrame_list,SubCount_list,CountFrame)#this is the control to check the frame 
+FrameCount_ORF_list <- map2(SubFrame_list,SubCount_list,CountFrame) #this is the control to check the frame 
 
 # from list into data frame
 FrameCount_df <- FrameCount_list %>% map(~ t(Reduce(rbind,.)))
@@ -190,8 +186,5 @@ FrameCount_ORF_List_df <- map(FrameCount_ORF_df,Calc_percent) # This is the cont
 #FrameCount_df <- map_df(FrameCount_List_df, ~as.data.frame(.x), .id="Sample")
 #FrameCount_ORF_df <- map_df(FrameCount_ORF_List_df, ~as.data.frame(.x), .id="Sample")
 
-
-#saveRDS(FrameCount_df,file.path(rds,paste(whichsample,"_FrameCount_df.rds")))
 saveRDS(FrameCount_List_df,file.path(rds,paste(whichsample,"IndiV_FrameCount_list.rds",sep = "_")))
-saveRDS(FrameCount_ORF_List_df,file.path(rds,paste(whichsample,"IndiV_FrameCount_ORF_list.rds",sep = "_")))
-
+#saveRDS(FrameCount_ORF_List_df,file.path(rds,paste(whichsample,"IndiV_FrameCount_ORF_list.rds",sep = "_")))
