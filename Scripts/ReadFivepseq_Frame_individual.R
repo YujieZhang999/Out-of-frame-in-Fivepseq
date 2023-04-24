@@ -194,3 +194,4 @@ FrameCount_ORF_List_df <- map(FrameCount_ORF_df,Calc_percent) # This is the cont
 #saveRDS(FrameCount_df,file.path(rds,paste(whichsample,"_FrameCount_df.rds")))
 saveRDS(FrameCount_List_df,file.path(rds,paste(whichsample,"IndiV_FrameCount_list.rds",sep = "_")))
 saveRDS(FrameCount_ORF_List_df,file.path(rds,paste(whichsample,"IndiV_FrameCount_ORF_list.rds",sep = "_")))
+
