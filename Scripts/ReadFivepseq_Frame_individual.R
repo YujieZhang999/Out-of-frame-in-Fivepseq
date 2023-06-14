@@ -8,8 +8,8 @@ library("RGenetics")
 library("ggpubr")
 library("ggrepel")
 opts <- options(stringsAsFactors = F)
-## data input: generates a list with samples, and keeps the frame stats, transcript descriptors and libsize for each sample. 
 
+## data input: generates a list with samples, and keeps the frame stats, transcript descriptors and libsize for each sample. 
 # Read data from fivepseq output file
 data.name <- "data_summary.txt"
 data.files <- list.files(fivepseq_count, data.name, full.names = T, recursive = T)
@@ -57,8 +57,8 @@ for (t.ass.f in t.ass.files) {
 
 # filter low expressed genes: generated and index,which indicates high coverage genes
 # if only read the output from last step
-library_type <- "low" # or "high"
 
+library_type <- "low" # or "high"
 if (library_type == "low") {
   retain.ind <- c()
   rpm_threshold <- 10
@@ -72,7 +72,6 @@ if (library_type == "low") {
   pos_threshold <- 40
   gene_length <- 400
 }
-
 
 sample_type <- "other" # or "human"
 for (s in samples) {
@@ -89,7 +88,6 @@ for (s in samples) {
   } else {
     pass.ind <- intersect(pass.ind, which(t.des$len >= gene_length))
   }
-  
   retain.ind <- c(retain.ind, pass.ind)
   retain.ind <- intersect(pass.ind, retain.ind)
   retain.ind <- unique(retain.ind)
