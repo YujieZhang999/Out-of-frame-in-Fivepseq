@@ -2,8 +2,8 @@
 
 ## Data preprocessing
 * using fivepseq package v1.2.0 https://github.com/lilit-nersisyan/fivepseq
-* submit *Preprocess_Fivepseq_yeast.sh* for fivepseq in yeast for the pipline including cutadapter, extract UMI, align to genome and deduplicate.
-* submit *Preprocess_Human_riboseq.sh* for riboseq in human(Downloaded from GEO: GSE113751, DOI:10.1016/j.molcel.2018.06.041)
+* submit ```Preprocess_Fivepseq_yeast.sh``` for fivepseq in yeast for the pipline including cutadapter, extract UMI, align to genome and deduplicate.
+* submit ```Preprocess_Human_riboseq.sh```for riboseq in human(Downloaded from GEO: GSE113751, DOI:10.1016/j.molcel.2018.06.041)
 * Input data is fastq , output data directly from fivepseq package 
 * use the output for Fig1
 
@@ -25,8 +25,8 @@ source(file.path(source_code,"CalculateGene_FSindex.R"))
 
 
 ## 3. Calculate RNA half-life using SLAM-seq data
-* Input data is the T-C conversion counts txt from *Preprocessing_SLAM-Seq.sh*
-* use the *SLAMSeq_halflife.R* to calculate the RNA half-life
+* Input data is the T-C conversion counts txt from ```Preprocessing_SLAM-Seq.sh```
+* use the ```SLAMSeq_halflife.R``` to calculate the RNA half-life
 * use the output for Fig3
 
 
@@ -41,13 +41,13 @@ source(file.path(source_code,"CalculateCodon_FSindex.R"))
 
 ## 5. Protein abundance change by MS 
 * Input data is table for protein quantification statistics
-* use *MS_protein_abundance.R* to compare the protein change in wt and upf1 mutant
+* use ```MS_protein_abundance.R``` to compare the protein change in wt and upf1 mutant
 * use the output for Fig5
 
 
 
 ## 6. Count the out-of-frame genes in bacteria and human
-* Input data is the frameshift index calculated from *CalculateGene_FSindex.R*
-* use *Out_of_frame_bacteria_human.R* to correlate the frameshift index with codon composition
+* Input data is the frameshift index calculated from ```CalculateGene_FSindex.R```
+* use ```Out_of_frame_bacteria_human.R``` to correlate the frameshift index with codon composition
 * use the output for Fig6
 
