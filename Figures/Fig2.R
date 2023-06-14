@@ -1,9 +1,9 @@
 library("LSD")
-source(file.path(source_code,"LSD.heatscatter.R"))
-# # -----------------------------------------------------------------------
-# This is to plot density plot using LSD package
-DIFF <- readRDS(file.path(rds,paste(whichsample,"YPD_CSM_ctrl_merge_diff_mean.rds",sep = "_")))
+source(file.path(source_code,"LSD.heatscatter.R")) # This is to plot density plot using LSD package
 
+# # -----------------------------------------------------------------------
+# Density plot for the difference of frameshift index
+# # -----------------------------------------------------------------------
 plot_heatscatter_density <- function(control,sample,df){
 gg <- LSD.heatscatterpoints(df$F.F1_aver, df$F.F0_aver, xlab = control, ylab = sample, ggplot = TRUE)
 gg + 
@@ -66,8 +66,12 @@ perfect = plot_grid(first_col, second_col, ncol = 2, rel_widths = c(3, 1))
 save_plot(filename = file.path(plotdir,paste(sample,control,"heatscatter_density.pdf",sep="_")), perfect, base_height=4)
 }
 
+# # -----------------------------------------------------------------------
+# Read the data from the output of CalculateGene_FSindex.R
+# # -----------------------------------------------------------------------
+Frameshift_df <- readRDS(file.path(rds,paste(whichsample,"Frameshift_df.rds",sep = "_")))
 for (i in 1:length(unique(group_condition))){
-  df_Comp <- TwoGroup_Compare("YPD_ctrl",unique(group_condition)[i])
+#  df_Comp <- TwoGroup_Compare("YPD_ctrl",unique(group_condition)[i])
   plot_diff <- plot_heatscatter_density("YPD_ctrl",unique(group_condition)[i],df_Comp)
 }
 
