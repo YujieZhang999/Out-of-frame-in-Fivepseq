@@ -1,6 +1,13 @@
 # Download fivepseq package from https://github.com/lilit-nersisyan/fivepseq
 
-#!/bin/bash -l
+#!/bin/sh
+#SBATCH -A 
+#SBATCH -p node
+#SBATCH -n 4
+#SBATCH -t 2-50:00:00
+#SBATCH -J riboseq_preprocess_and_fivepseq
+#SBATCH -o log/riboseq_preprocess_and_fivepseq.log
+
 
 f_dir='fastq'
 fname=${f_dir##*/}

@@ -24,14 +24,14 @@ cd $fastqdir
 find *.fastq.gz | parallel -a - -j 16 seqkit seq --seq-type DNA -r -p {} '|' gzip -c  '>' ../RCread1/{} 
 
 # Step 2: Using nextflow slamdunk perform T to C conversions calling
-# for default setting conversion >= 2 is considered as labeled
+# for default setting conversion >= 1 is considered as labeled
 # output "_filtered_tcount_collapsed.csv" later used for RNA halflife calculation
 cd $workdir
 
 nextflow run $NXF_HOME/assets/nf-core/slamseq/main.nf \
 -profile uppmax \
 --trim5 2 \
---conversions 2 \
+--conversions 1 \
 --project 'snic2018-8-292' \
 --fasta /crex/data/igenomes/Saccharomyces_cerevisiae/UCSC/sacCer3/Sequence/WholeGenomeFasta/genome.fa \
 --bed $utrbed \
